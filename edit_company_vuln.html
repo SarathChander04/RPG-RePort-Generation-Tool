@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Edit Vulnerability for {{ company }}{% endblock %}
+{% block content %}
+
+<h2>Edit Vulnerability for {{ company }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div>
+        <label>Vulnerability Name:</label>
+        {{ vuln_data[1] }}
+    </div>
+    <div>
+        <label>VAPT Type:</label>
+        {{ vuln_data[2] }}
+    </div>
+    <div>
+        <label>Severity:</label>
+        {{ vuln_data[3] }}
+    </div>
+    <div>
+        <label>CVSS Score:</label>
+        <input type="text" name="cvss_score" value="{{ vuln_data[4] or '' }}" readonly>
+    </div>
+    <br>
+    <h4>Edit Targets</h4>
+    <table id="targets_table">
+        <tr>
+            <th>Target Name</th>
+            <th>Class</th>
+            <th>Port (optional)</th>
+        </tr>
+        {% for t in targets %}
+        <tr>
+            <td><input name="target_name" value="{{ t[0] }}" type="text" required></td>
+            <td>
+                <select name="target_class">
+                    <option value="">---</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls }}" {% if t[1] == cls %}selected{% endif %}>{{ cls }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><input name="target_port" value="{% if t|length > 2 %}{{ t[2] }}{% endif %}" type="text" placeholder="Port"></td>
+        </tr>
+        {% endfor %}
+        <!-- Use Javascript to add/edit more target rows if desired -->
+    </table>
+    <br>
+    <h4>Evidence</h4>
+    <div>
+        <input type="file" name="evidence_file">
+        <br>Current: {{ vuln_data[5] }}
+        <br>OR
+        <textarea name="evidence_text" rows="3" placeholder="Update or paste evidence here"></textarea>
+    </div>
+    <br>
+    <button type="submit">Update</button>
+</form>
+
+{% endblock %}

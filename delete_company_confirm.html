@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Deletion{% endblock %}
+
+{% block content %}
+<h2>Confirm Deletion of Company: {{ company }}</h2>
+
+<p>This action <strong>cannot be undone</strong>. Please type the company name exactly to confirm deletion.</p>
+
+<form method="post" action="{{ url_for('delete_company') }}" onsubmit="return validateConfirm();">
+  <input type="hidden" name="company_name" value="{{ company }}">
+  
+  <label for="confirm_input">Type company name to confirm:</label><br>
+  <input type="text" id="confirm_input" name="confirm_name" required autocomplete="off" style="width: 300px; padding: 6px; margin-top: 5px;"><br><br>
+  
+  <button type="submit" class="btn btn-danger">Delete Company</button>
+  <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+function validateConfirm() {
+  const expected = "{{ company|e }}";
+  const entered = document.getElementById('confirm_input').value.trim();
+  if (entered !== expected) {
+    alert("Company name does not match. Please type the exact company name to confirm.");
+    return false;
+  }
+  return confirm("Are you sure you want to permanently delete company '" + expected + "'?");
+}
+</script>
+{% endblock %}

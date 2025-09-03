@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Check Target{% endblock %}
+
+{% block content %}
+<h2>Check Target Vulnerabilities</h2>
+
+<form method="get" action="{{ url_for('view_target_details') }}" style="display:flex; gap:10px; align-items:center; margin-bottom: 20px;">
+    <div class="form-group" style="flex-grow:1; margin-bottom: 0;">
+        <label for="target_name" style="display: none;">Target</label>
+        <input type="text" name="target_name" placeholder="Target name" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Check</button>
+</form>
+
+{% if target_info %}
+    <h3>Details for {{ target_name }}</h3>
+    {% if target_info.vulns %}
+        <ul style="list-style: none; padding: 0;">
+        {% for v in target_info.vulns %}
+            <li style="padding: 10px 0; border-bottom: 1px solid var(--border-color-light);">
+                <strong>{{ v.vuln_name }}</strong> — {{ v.severity }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No vulnerabilities for this target.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

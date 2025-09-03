@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Add First Target for {{ company }}{% endblock %}
+
+{% block content %}
+<h2>Add First Target for {{ company }}</h2>
+
+<form method="POST" enctype="multipart/form-data" id="multi-vuln-form">
+  <div>
+    <label for="target_ip">Target IP Address:</label>
+    <input type="text" id="target_ip" name="target_ip" required />
+  </div>
+
+  <div>
+    <label for="target_class">Target Class:</label>
+    <select id="target_class" name="target_class" required>
+      <option value="" disabled selected>Select Class</option>
+      {% for cls in classes %}
+      <option value="{{ cls }}">{{ cls }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <hr />
+
+  <h3>Vulnerabilities for this Target</h3>
+  <p>Add one or more vulnerabilities. Each row may include its own evidence and optional port.</p>
+
+  <input type="hidden" id="row_count" name="row_count" value="1" />
+
+  <div id="vuln-rows">
+    <!-- Row template -->
+    <div class="vuln-row" data-index="0">
+      <div>
+        <label>Vulnerability:</label>
+        <select name="vuln_id[]" required>
+          <option value="" disabled selected>Select Vulnerability</option>
+          {% for v in master_vulns %}
+          <option value="{{ v.id }}">{{ v.name }} ({{ v.severity }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Port (optional):</label>
+        <input type="text" name="port[]" pattern="\d*" placeholder="e.g., 80" />
+      </div>
+
+      <fieldset>
+        <legend>Evidence (file or text required)</legend>
+        <div>
+          <label>Upload Evidence File (png, jpg, jpeg, pdf, txt):</label>
+          <input type="file" name="evidence_file_0" accept=".png,.jpg,.jpeg,.pdf,.txt" />
+        </div>
+        <div>
+          <label>Or Enter Evidence Text:</label>
+          <textarea name="evidence_text_0" rows="3" cols="50"></textarea>
+        </div>
+      </fieldset>
+
+      <button type="button" class="remove-row" onclick="removeRow(this)" style="display:none;">Remove</button>
+      <hr />
+    </div>
+  </div>
+
+  <button type="button" id="add-row">+ Add another vulnerability</button>
+
+  <br /><br />
+  <button type="submit">Add Target and Vulnerabilities</button>
+</form>
+
+<script>
+(function() {
+  const container = document.getElementById('vuln-rows');
+  const addBtn = document.getElementById('add-row');
+  const rowCountInput = document.getElementById('row_count');
+
+  function createRow(index) {
+    const div = document.createElement('div');
+    div.className = 'vuln-row';
+    div.setAttribute('data-index', index);
+    div.innerHTML = `
+      <div>
+        <label>Vulnerability:</label>
+        <select name="vuln_id[]" required>
+          <option value="" disabled selected>Select Vulnerability</option>
+          {% for v in master_vulns %}
+          <option value="{{ v.id }}">{{ v.name }} ({{ v.severity }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Port (optional):</label>
+        <input type="text" name="port[]" pattern="\\d*" placeholder="e.g., 80" />
+      </div>
+
+      <fieldset>
+        <legend>Evidence (file or text required)</legend>
+        <div>
+          <label>Upload Evidence File (png, jpg, jpeg, pdf, txt):</label>
+          <input type="file" name="evidence_file_${index}" accept=".png,.jpg,.jpeg,.pdf,.txt" />
+        </div>
+        <div>
+          <label>Or Enter Evidence Text:</label>
+          <textarea name="evidence_text_${index}" rows="3" cols="50"></textarea>
+        </div>
+      </fieldset>
+
+      <button type="button" class="remove-row" onclick="removeRow(this)">Remove</button>
+      <hr />
+    `;
+    return div;
+  }
+
+  addBtn.addEventListener('click', function() {
+    let count = parseInt(rowCountInput.value || '0', 10);
+    const idx = count;
+    container.appendChild(createRow(idx));
+    count += 1;
+    rowCountInput.value = String(count);
+
+    // Show remove buttons when more than one row
+    updateRemoveButtons();
+  });
+
+  window.removeRow = function(btn) {
+    const row = btn.closest('.vuln-row');
+    if (!row) return;
+    row.remove();
+
+    // Re-index remaining rows so evidence_file_X and evidence_text_X names match indices expected by backend
+    const rows = Array.from(container.querySelectorAll('.vuln-row'));
+    rows.forEach((r, newIdx) => {
+      r.setAttribute('data-index', newIdx);
+      const file = r.querySelector('input[type="file"]');
+      const text = r.querySelector('textarea');
+      if (file) file.setAttribute('name', `evidence_file_${newIdx}`);
+      if (text) text.setAttribute('name', `evidence_text_${newIdx}`);
+    });
+
+    rowCountInput.value = String(rows.length);
+    updateRemoveButtons();
+  }
+
+  function updateRemoveButtons() {
+    const rows = container.querySelectorAll('.vuln-row');
+    rows.forEach((r, i) => {
+      const btn = r.querySelector('.remove-row');
+      if (btn) btn.style.display = rows.length > 1 ? 'inline-block' : 'none';
+    });
+  }
+
+  // Initialize remove buttons state
+  updateRemoveButtons();
+})();
+</script>
+{% endblock %}

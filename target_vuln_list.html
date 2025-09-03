@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Target Vulnerability List{% endblock %}
+
+{% block content %}
+<h2>Vulnerabilities for Target</h2>
+
+{% if vulns %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Vulnerability</th>
+            <th>Severity</th>
+            <th>Evidence</th>
+            <th>Targets</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for v in vulns %}
+        <tr>
+            <td>{{ v.vuln_name }}</td>
+            <td>{{ v.severity }}</td>
+            <td>{{ v.evidence or '' }}</td>
+            <td>
+                {% for t in v.targets %}
+                    <div>{{ t[0] }} ({{ t[1] }})</div>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No vulnerabilities found for this target.</p>
+{% endif %}
+{% endblock %}

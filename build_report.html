@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Build Report — {{ company }}{% endblock %}
+
+{% block content %}
+<h2>Generate Report</h2>
+<form method="POST">
+  <label>Select Vulnerability Type:</label><br>
+  {% for vt in vapt_types %}
+    <input type="radio" id="vt_{{ vt }}" name="vapt_type" value="{{ vt }}" 
+      {% if selected_type == vt %}checked{% endif %} required>
+    <label for="vt_{{ vt }}">{{ vt }}</label><br>
+  {% endfor %}
+  <br>
+  <button type="submit">Generate Preview</button>
+</form>
+{% endblock %}
