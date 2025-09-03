@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Company — {{ company }}{% endblock %}
+
+{% block content %}
+
+<div class="actions" style="margin-bottom: 1em;">
+  <a class="btn btn-success" href="{{ url_for('add_target_first', company=company) }}">Add Target First</a>
+  <a class="btn btn-primary" href="{{ url_for('add_vuln_to_company', company=company) }}">Add Vulnerability</a>
+  <a class="btn btn-secondary" href="{{ url_for('build_report', company=company) }}">Build Report</a>
+  <form style="display:inline-block; margin-left:1em;" method="get" action="{{ url_for('search_target_vulns', company=company) }}">
+    <input type="text" name="target" placeholder="Target search" required>
+    <button class="btn btn-info" type="submit">Target Search</button>
+  </form>
+</div>
+
+<table class="table">
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Name</th>
+  <th>Severity</th>
+  <th>Evidence</th>
+  <th>Targets</th>
+  <th>Actions</th>
+</tr>
+</thead>
+<tbody>
+{% if vulns %}
+  {% for v in vulns %}
+    <tr>
+      <td>{{ v.vuln_id }}</td>
+      <td>{{ v.vuln_name }}</td>
+      <td>{{ v.severity }}</td>
+      <td>
+        {% if v.evidence %}
+          {% set ev = v.evidence.lower() %}
+          {% if ev.endswith('.png') or ev.endswith('.jpg') or ev.endswith('.jpeg') or ev.endswith('.pdf') or ev.endswith('.txt') %}
+            <a href="{{ url_for('evidence_file', relpath=v.evidence) }}" target="_blank">View Evidence</a>
+          {% else %}
+            {{ v.evidence }}
+          {% endif %}
+        {% else %}
+          —
+        {% endif %}
+      </td>
+      <td>
+        {% if v.targets and v.targets|length > 0 %}
+          {% for item in v.targets %}
+            {% if item is iterable and (item|length >= 2) %}
+              {{ item[0] }}{% if item[1] %} ({{ item[1] }}){% endif %}
+            {% elif item is iterable and (item|length == 1) %}
+              {{ item[0] }}
+            {% else %}
+              {{ item }}
+            {% endif %}
+            {% if not loop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          —
+        {% endif %}
+      </td>
+      <td>
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_company_vuln', company=company, vuln_id=v.vuln_id) }}">Edit</a>
+        <form method="post" action="{{ url_for('delete_company_vuln_route', company=company, vuln_id=v.vuln_id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this vulnerability?');">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr><td colspan="6">No vulnerability entries found for this company.</td></tr>
+{% endif %}
+</tbody>
+</table>
+
+{% endblock %}

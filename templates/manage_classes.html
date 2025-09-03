@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Classes — {{ company }}{% endblock %}
+
+{% block content %}
+<h2>Manage Classes for {{ company }}</h2>
+
+<form method="post" class="mb-3" style="max-width:400px;">
+  <div class="input-group">
+    <input type="text" name="new_class" placeholder="New class name" class="form-control" required>
+    <button type="submit" class="btn btn-primary">Add Class</button>
+  </div>
+</form>
+
+<table class="table table-striped" style="max-width: 500px;">
+  <thead>
+    <tr>
+      <th>Class Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if classes %}
+      {% for cls in classes %}
+      <tr>
+        <td>{{ cls }}</td>
+        <td>
+          <form method="post" action="{{ url_for('delete_class', company=company) }}"
+                onsubmit="return confirm('Are you sure you want to delete class {{ cls }}?');" style="display:inline;">
+            <input type="hidden" name="class_name" value="{{ cls }}">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr><td colspan="2">No classes found.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Homepage</a>
+{% endblock %}

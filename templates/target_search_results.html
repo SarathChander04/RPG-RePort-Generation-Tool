@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Target Vulnerabilities — {{ company }}{% endblock %}
+
+{% block content %}
+<h2>Target Search: {{ target }}</h2>
+
+<div class="actions" style="margin-bottom: 1em;">
+  <a class="btn btn-primary" href="{{ url_for('add_vuln_to_company', company=company) }}">Add Vulnerability</a>
+  <a class="btn btn-secondary" href="{{ url_for('build_report', company=company) }}">Build Report</a>
+  <form style="display:inline-block; margin-left:1em;" method="get" action="{{ url_for('search_target_vulns', company=company) }}">
+    <input type="text" name="target" placeholder="Target search" required>
+    <button class="btn btn-info" type="submit">Target Search</button>
+  </form>
+</div>
+
+<table class="table">
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Vulnerability Name</th>
+  <th>Severity</th>
+  <th>Evidence</th>
+  <th>Targets</th>
+</tr>
+</thead>
+<tbody>
+{% if vulns %}
+  {% for v in vulns %}
+    <tr>
+      <td>{{ v.vuln_id }}</td>
+      <td>{{ v.vuln_name }}</td>
+      <td>{{ v.severity }}</td>
+      <td>
+        {% if v.evidence %}
+          <a href="{{ url_for('evidence_file', relpath=v.evidence) }}" target="_blank">View Evidence</a>
+        {% else %}
+          —
+        {% endif %}
+      </td>
+      <td>
+        {% if v.targets and v.targets|length > 0 %}
+          {% for item in v.targets %}
+            {% if item is iterable and (item|length >= 2) %}
+              {{ item[0] }}{% if item[1] %} ({{ item[1] }}){% endif %}
+            {% elif item is iterable and (item|length == 1) %}
+              {{ item[0] }}
+            {% else %}
+              {{ item }}
+            {% endif %}
+            {% if not loop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          —
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr><td colspan="5">No vulnerabilities found for target "{{ target }}".</td></tr>
+{% endif %}
+</tbody>
+</table>
+<a class="btn btn-link" href="{{ url_for('view_target_vulns_route', company=company) }}">Back to Vulnerabilities</a>
+{% endblock %}

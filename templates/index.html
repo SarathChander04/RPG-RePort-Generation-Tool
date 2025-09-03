@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Companies</h2>
+  <a href="{{ url_for('view_vulns') }}" class="btn btn-secondary">Master Vulnerabilities</a>
+</div>
+
+{% if companies %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th style="width: 300px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in companies %}
+      <tr>
+        <td><strong>{{ c }}</strong></td>
+        <td>
+          <div class="btn-group" role="group" aria-label="Actions">
+            <a href="{{ url_for('view_target_vulns_route', company=c) }}" class="btn btn-primary btn-sm">Open</a>
+            <a href="{{ url_for('confirm_delete_company', company=c) }}" class="btn btn-danger btn-sm">Delete</a>
+            <a href="{{ url_for('manage_classes', company=c) }}" class="btn btn-secondary btn-sm ms-2">Manage Classes</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No companies available.</p>
+{% endif %}
+
+<div class="card mt-4" style="max-width: 400px;">
+  <div class="card-body">
+    <h5 class="card-title">Add New Company</h5>
+    <form method="post" action="{{ url_for('add_company_route') }}">
+      <div class="mb-3">
+        <label for="company_name" class="form-label">Company Name</label>
+        <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Example Corp" required>
+      </div>
+      <button type="submit" class="btn btn-success">Add Company</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
