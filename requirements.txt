@@ -1,0 +1,10 @@
+Flask>=2.0
+Werkzeug>=2.0
+Jinja2>=3.0
+python-docx>=0.8.10
+
+# Optional recommended (safe to include, Flask indirectly pulls these)
+click>=8.0
+itsdangerous>=2.0
+MarkupSafe>=2.0
+typing-extensions>=4.0
