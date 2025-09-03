@@ -1,0 +1,31 @@
+/* Page spacing */
+main.container { padding: 22px 16px; }
+
+/* Section wrappers */
+.section {
+  margin: 16px 0 22px;
+}
+
+/* Form actions row */
+.actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+
+/* Tables: convert your existing pages to use .table */
+.table-actions {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+/* Subtle link */
+.link {
+  color: var(--primary);
+  text-decoration: none;
+}
+.link:hover { text-decoration: underline; }
+
+/* Head blocks */
+.page-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 14px;
+}
+.page-head h2 { margin: 0; }
